@@ -1,0 +1,65 @@
+1)Create an S3 Glacier Vault
+aws glacier create-vault --account-id - --vault-name myvault
+{
+    "location": "/123456789012/vaults/myvault"
+}
+	
+2)Prepare a File for uploading
+*Linux/macOS
+dd if=/dev/urandom of=largefile bs=3145728 count=1
+
+*Windows
+C:\> fsutil file createnew largefile 3145728
+
+->split --bytes=1048576 --verbose largefile chunk
+
+3)Iniating a Multipart Upload and Upload Files
+aws glacier initiate-multipart-upload --account-id - --archive-description "multipart upload test" --part-size 1048576 --vault-name myvault
+{
+    "uploadId": "19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ",
+    "location": "/123456789012/vaults/myvault/multipart-uploads/19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ"
+}
+
+Save the uploadID in a shell or windows variable:
+*Linux/macOS
+UPLOADID="19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ"
+aws glacier upload-multipart-part --upload-id $UPLOADID --body chunkaa --range 'bytes 0-1048575/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+$ aws glacier upload-multipart-part --upload-id $UPLOADID --body chunkab --range 'bytes 1048576-2097151/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+
+$ aws glacier upload-multipart-part --upload-id $UPLOADID --body chunkac --range 'bytes 2097152-3145727/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+*Windows
+set UPLOADID="19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-19gaRezEXAMPLES6Ry5YYdqthHOC_kGRCT03L9yetr220UmPtBYKk-OssZtLqyFu7sY1_lR7vgFuJV6NtcV5zpsJ"
+aws glacier upload-multipart-part --upload-id %$UPLOADID% --body chunkaa --range 'bytes 0-1048575/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+$ aws glacier upload-multipart-part --upload-id %$UPLOADID% --body chunkab --range 'bytes 1048576-2097151/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+
+$ aws glacier upload-multipart-part --upload-id %$UPLOADID% --body chunkac --range 'bytes 2097152-3145727/*' --account-id - --vault-name myvault
+{
+    "checksum": "e1f2a7cd6e047fa606fe2f0280350f69b9f8cfa602097a9a026360a7edc1f553"
+}
+
+each peach have 1048576 bytes
+0-1048575
+1045576-2097151
+2097152-3145727
+....
+
+4)Completing the Upload
+
+
+
+

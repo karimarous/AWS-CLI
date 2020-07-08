@@ -1,0 +1,126 @@
+1) Create IAM user and group:
+a)Create group:
+aws iam create-group --group-name MyIamGroup
+{
+    "Group": {
+        "GroupName": "MyIamGroup",
+        "CreateDate": "2018-12-14T03:03:52.834Z",
+        "GroupId": "AGPAJNUJ2W4IJVEXAMPLE",
+        "Arn": "arn:aws:iam::123456789012:group/MyIamGroup",
+        "Path": "/"
+        }
+}
+****
+b)Create a user:
+aws iam create-user --user-name MyUser
+{
+    "User": {
+        "UserName": "MyUser",
+        "Path": "/",
+        "CreateDate": "2018-12-14T03:13:02.581Z",
+        "UserId": "AIDAJY2PE5XUZ4EXAMPLE",
+        "Arn": "arn:aws:iam::123456789012:/user/MyUser"
+        }
+}
+*****
+c)Add user to group:
+aws iam add-user-to-group --user-name MyUser --group-name MyIamGroup
+*****
+d)To verify the group:
+aws iam get-group --group-name MyIamGroup
+{
+"Group": {
+        "GroupName": "MyIamGroup",
+        "CreateDate": "2018-12-14T03:03:52Z",
+        "GroupId": "AGPAJNUJ2W4IJVEXAMPLE",
+        "Arn": "arn:aws:iam::123456789012:group/MyIamGroup",
+        "Path": "/"
+    },
+    "Users": [
+        {
+            "UserName": "MyUser",
+            "Path": "/",
+            "CreateDate": "2018-12-14T03:13:02Z",
+"UserId": "AIDAJY2PE5XUZ4EXAMPLE",
+            "Arn": "arn:aws:iam::123456789012:user/MyUser"
+        }
+    ],
+    "IsTruncated": "false"
+}
+
+
+
+
+
+
+2)Attach an IAM Managed Policy to an IAM user:
+a)Determine the ARN of the policy and store it in a variable:
+export POLICYARN=$(aws iam list-policies --query 'Policies[?PolicyName==`PowerUserAccess`].{ARN:Arn}' --output text)       ~
+
+echo $POLICYARN
+arn:aws:iam::aws:policy/PowerUserAccess
+
+
+b)Attach the policy to a user
+aws iam attach-user-policy --user-name MyUser --policy-arn $POLICYARN
+
+
+c)List all the policies attached to a user:
+aws iam list-attached-user-policies --user-name MyUser
+{
+    "AttachedPolicies": [
+        {
+"PolicyName": "PowerUserAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/PowerUserAccess"
+        }
+    ]
+}
+
+
+Important !!! :if you want to access EC2, S3 or other services:
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access.html#access_resources
+
+
+
+3)Set an Initial Password for an IAM user
+a)Set inital password and force password reset :
+aws iam create-login-profile --user-name MyUser --password My!User1Login8P@ssword --password-reset-required
+{
+    "LoginProfile": {
+        "UserName": "MyUser",
+        "CreateDate": "2018-12-14T17:27:18Z",
+        "PasswordResetRequired": true
+    }
+}
+
+b)Update password:
+aws iam update-login-profile --user-name MyUser --password My!User1ADifferentP@ssword
+
+
+4)Create an access Key for an IAM user:
+IAM user could have only two
+a)Create Access Key:
+aws iam create-access-key --user-name MyUser
+{
+    "AccessKey": {
+        "UserName": "MyUser",
+        "AccessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "Status": "Active",
+        "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "CreateDate": "2018-12-14T17:34:16Z"
+    }
+}
+
+
+b)Delete Access Key by AccesKeyID:
+aws iam delete-access-key --user-name MyUser --access-key-id AKIAIOSFODNN7EXAMPLE
+
+
+
+
+
+
+
+
+
+

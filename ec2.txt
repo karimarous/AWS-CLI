@@ -1,0 +1,287 @@
+1)Key Pair
+a)create a Key Pair:
+
+Linux:
+aws ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text > MyKeyPair.pem
+
+Windows:
+aws ec2 create-key-pair --key-name MyKeyPair --query 'KeyMaterial' --output text | out-file -encoding ascii -filepath MyKeyPair.pem
+
+=>the private key isn't stored in AWS
+
+Linux: make key read only
+ chmod 400 MyKeyPair
+
+b)Display your Key Pair:
+aws ec2 describe-key-pairs --key-name MyKeyPair
+
+c)Delete Key Pair:
+aws ec2 delete-key-pair --key-name MyKeyPair
+
+
+2)Security Group
+a)Create SG:
+*For specific VPC :E2-VPC
+aws ec2 create-security-group --group-name my-sg --description "My security group" --vpc-id vpc-1a2b3c4d
+{
+    "GroupId": "sg-s c903004f8"
+} 
+*EC2-Classic:
+$ aws ec2 create-security-group --group-name my-sg --description "My security group"
+{
+    "GroupId": "sg-903004f8"
+}
+
+
+b) Describe SG:
+*EC2-VPC
+aws ec2 describe-security-groups --group-ids sg-903004f8
+
+*EC2-Classic:
+aws ec2 describe-security-groups --group-names my-sg
+
+c)Add rules to SG:
+get your own IP
+curl https://checkip.amazonaws.com
+
+EC2-VPC
+RDP:
+aws ec2 authorize-security-group-ingress --group-id sg-903004f8 --protocol tcp --port 3389 --cidr 203.0.113.0/24
+SSH:
+aws ec2 authorize-security-group-ingress --group-id sg-903004f8 --protocol tcp --port 22 --cidr 203.0.113.0/24
+
+EC2-Classic
+RDP:
+aws ec2 authorize-security-group-ingress --group-name my-sg --protocol tcp --port 3389 --cidr 203.0.113.0/24
+
+aws ec2 authorize-security-group-ingress --group-name my-sg --protocol tcp --port 22 --cidr 203.0.113.0/24
+
+d)Delete SG:
+*EC2-VPC:
+aws ec2 delete-security-group --group-id sg-903004f8
+
+*EC2-Classic:
+aws ec2 delete-security-group --group-name my-sg
+
+3)EC2:
+a)Launch an Instance:
+*EC2-VPC:
+aws ec2 run-instances --image-id ami-xxxxxxxx --count 1 --instance-type t2.micro --key-name MyKeyPair --security-group-ids sg-903004f8 --subnet-id subnet-6e7f829e
+{
+    "OwnerId": "123456789012",
+    "ReservationId": "r-5875ca20",
+    "Groups": [
+{
+            "GroupName": "my-sg",
+            "GroupId": "sg-903004f8"
+        }
+    ],
+    "Instances": [
+        {
+            "Monitoring": {
+                "State": "disabled"
+            },
+            "PublicDnsName": null,
+            "Platform": "windows",
+            "State": {
+                "Code": 0,
+                "Name": "pending"
+            },
+            "EbsOptimized": false,
+            "LaunchTime": "2013-07-19T02:42:39.000Z",
+            "PrivateIpAddress": "10.0.1.114",
+            "ProductCodes": [],
+            "VpcId": "vpc-1a2b3c4d",
+            "InstanceId": "i-5203422c",
+            "ImageId": "ami-173d747e",
+            "PrivateDnsName": ip-10-0-1-114.ec2.internal,
+            "KeyName": "MyKeyPair",
+            "SecurityGroups": [
+                {
+                    "GroupName": "my-sg",
+                    "GroupId": "sg-903004f8"
+                }
+            ],
+            "ClientToken": null,
+            "SubnetId": "subnet-6e7f829e",
+            "InstanceType": "t2.micro",
+            "NetworkInterfaces": [
+                {
+                    "Status": "in-use",
+                    "SourceDestCheck": true,
+                    "VpcId": "vpc-1a2b3c4d",
+                    "Description": "Primary network interface",
+                    "NetworkInterfaceId": "eni-a7edb1c9",
+                    "PrivateIpAddresses": [
+                        {
+                            "PrivateDnsName": "ip-10-0-1-114.ec2.internal",
+                            "Primary": true,
+                            "PrivateIpAddress": "10.0.1.114"
+                        }
+                    ],
+"                   PrivateDnsName": "ip-10-0-1-114.ec2.internal",
+                    "Attachment": {
+                        "Status": "attached",
+                        "DeviceIndex": 0,
+                        "DeleteOnTermination": true,
+                        "AttachmentId": "eni-attach-52193138",
+                        "AttachTime": "2013-07-19T02:42:39.000Z"
+                    },
+                    "Groups": [
+                        {
+                            "GroupName": "my-sg",
+                    "GroupId": "sg-903004f8"
+                        }
+                    ],
+                    "SubnetId": "subnet-6e7f829e",
+                    "OwnerId": "123456789012",
+                    "PrivateIpAddress": "10.0.1.114"
+                }              
+            ],
+            "SourceDestCheck": true,
+            "Placement": {
+                "Tenancy": "default",
+                "GroupName": null,
+                "AvailabilityZone": "us-west-2b"
+                 },
+            "Hypervisor": "xen",
+            "BlockDeviceMappings": [
+                {
+                    "DeviceName": "/dev/sda1",
+                    "Ebs": {
+                        "Status": "attached",
+                        "DeleteOnTermination": true,
+                        "VolumeId": "vol-877166c8",
+                        "AttachTime": "2013-07-19T02:42:39.000Z"
+                    }
+                }
+            ],
+            "Architecture": "x86_64",
+            "StateReason": {
+                "Message": "pending",
+                "Code": "pending"
+            },
+            "RootDeviceName": "/dev/sda1",
+            "VirtualizationType": "hvm",
+            "RootDeviceType": "ebs",
+            "Tags": [
+                {
+                    "Value": "MyInstance",
+                    "Key": "Name"
+                }
+            ],
+            "AmiLaunchIndex": 0
+        }
+    ]
+}
+
+
+
+*EC2-Classic:
+aws ec2 run-instances --image-id ami-173d747e --count 1 --instance-type t1.micro --key-name MyKeyPair --security-groups my-sg
+{
+    "OwnerId": "123456789012",
+    "ReservationId": "r-5875ca20",
+    "Groups": [
+        {
+            "GroupName": "my-sg",
+            "GroupId": "sg-903004f8"
+        }
+    ],
+    "Instances": [
+        {
+    "Monitoring": {
+                "State": "disabled"
+            },
+            "PublicDnsName": null,
+            "Platform": "windows",
+            "State": {
+                "Code": 0,
+                "Name": "pending"
+            },
+            "EbsOptimized": false,
+            "LaunchTime": "2013-07-19T02:42:39.000Z",
+            "ProductCodes": [],
+            "InstanceId": "i-5203422c",
+            "ImageId": "ami-173d747e",
+            "PrivateDnsName": null,
+            "KeyName": "MyKeyPair",
+            "SecurityGroups": [
+                {
+                    "GroupName": "my-sg",
+                    "GroupId": "sg-903004f8"
+                }
+            ],
+            "ClientToken": null,
+            "InstanceType": "t1.micro",
+            "NetworkInterfaces": [],
+            "Placement": {
+                "Tenancy": "default",
+                "GroupName": null,
+                "AvailabilityZone": "us-west-2b"
+            },
+            "Hypervisor": "xen",
+            "BlockDeviceMappings": [
+                {
+                    "DeviceName": "/dev/sda1",
+                    "Ebs": {
+                        "Status": "attached",
+                        "DeleteOnTermination": true,
+                        "VolumeId": "vol-877166c8",
+            "AttachTime": "2013-07-19T02:42:39.000Z"
+                    }
+                }              
+            ],
+            "Architecture": "x86_64",
+            "StateReason": {
+                "Message": "pending",
+                "Code": "pending"
+            },
+            "RootDeviceName": "/dev/sda1",
+            "VirtualizationType": "hvm",
+            "RootDeviceType": "ebs",
+            "Tags": [
+                {
+                    "Value": "MyInstance",
+                    "Key": "Name"
+                }
+            ],
+            "AmiLaunchIndex": 0
+        }
+    ]
+}
+
+
+b) Add a block device:
+Empty EBS:
+--block-device-mappings "[{\"DeviceName\":\"/dev/sdf\",\"Ebs\":{\"VolumeSize\":20,\"DeleteOnTermination\":false}}]"
+EBS snapshot:
+--block-device-mappings "[{\"DeviceName\":\"/dev/sdf\",\"Ebs\":{\"SnapshotId\":\"snap-a1b2c3d4\"}}]"
+Instance store volume:
+--block-device-mappings "[{\"DeviceName\":\"/dev/sdf\",\"VirtualName\":\"ephemeral0\"},{\"DeviceName\":\"/dev/sdg\",\"VirtualName\":\"ephemeral1\"}]"
+
+c)Add Tag:
+aws ec2 create-tags --resources i-5203422c --tags Key=Name,Value=MyInstance
+
+d)Listing your instances:
+*List any instance that hist type is t2.micro
+aws ec2 describe-instances --filters "Name=instance-type,Values=t2.micro" --query "Reservations[].Instances[].InstanceId"
+*List any instance that have the tag Name
+aws ec2 describe-instances --filters "Name=tag:Name,Values=MyInstance"
+*List any instance that is launched using some specific ami-xxxx
+aws ec2 describe-instances --filters "Name=image-id,Values=ami-x0123456,ami-y0123456,ami-z0123456"
+
+
+d)Terminate instance by id:
+aws ec2 terminate-instances --instance-ids i-5203422c
+
+
+ 
+
+
+
+
+
+
+
+

@@ -1,0 +1,75 @@
+aws synamodb help
+
+1)Create table
+aws dynamodb create-table \
+    --table-name MusicCollection \
+    --attribute-definitions \
+        AttributeName=Artist,AttributeType=S AttributeName=SongTitle,AttributeType=S \
+    --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+
+
+
+2)Add line
+$ aws dynamodb put-item \
+    --table-name MusicCollection \
+    --item '{
+        "Artist": {"S": "No One You Know"},
+        "SongTitle": {"S": "Call Me Today"} ,
+	"AlbumTitle": {"S": "Somewhat Famous"} }' \
+    --return-consumed-capacity TOTAL
+
+{
+    "ConsumedCapacity": {
+        "CapacityUnits": 1.0,
+        "TableName": "MusicCollection"
+    }
+}
+
+
+or
+
+creat file named expression-attributes.json
+ {
+  ":v1": {"S": "No One You Know"},
+  ":v2": {"S": "Call Me Today"}
+}
+
+aws dynamodb query --table-name MusicCollection \
+    --key-condition-expression "Artist = :v1 AND SongTitle = :v2" \
+    --expression-attribute-values file://expression-attributes.json
+
+{
+    "Count": 1,
+    "Items": [
+        {
+            "AlbumTitle": {
+                "S": "Somewhat Famous"
+	},
+            "SongTitle": {
+                "S": "Call Me Today"
+            },
+            "Artist": {
+                "S": "No One You Know"
+            }
+        }
+    ],
+    "ScannedCount": 1,
+    "ConsumedCapacity": null
+}
+
+https://docs.aws.amazon.com/cli/latest/reference/dynamodb/index.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+

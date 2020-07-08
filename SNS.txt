@@ -1,0 +1,38 @@
+1)Create a Topic:
+aws sns create-topic --name my-topic
+{
+    "TopicArn": "arn:aws:sns:us-west-2:123456789012:my-topic"
+}
+
+*List topics
+aws sns list-topics
+
+2)Subscribe to a Topic:
+aws sns subscribe --topic-arn arn:aws:sns:us-west-2:123456789012:my-topic --protocol email --notification-endpoint saanvi@example.com
+{
+    "SubscriptionArn": "pending confirmation"
+}
+
+*List subscription:
+aws sns list-subscriptions
+
+
+
+Open mail and cofirm subscription
+
+3)Publish to a Topic:
+aws sns publish --topic-arn arn:aws:sns:us-west-2:123456789012:my-topic --message "Hello World!"
+{
+    "MessageId": "4e41661d-5eec-5ddf-8dab-2c867EXAMPLE"
+}
+
+
+4)Unsubscribe from a Topic:
+aws sns unsubscribe --subscription-arn arn:aws:sns:us-west-2:123456789012:my-topic:1328f057-de93-4c15-512e-8bb22EXAMPLE
+
+5)Delete a Topic:
+$ aws sns delete-topic --topic-arn arn:aws:sns:us-west-2:123456789012:my-topic
+
+
+
+

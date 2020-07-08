@@ -1,0 +1,44 @@
+Install cli Windows 
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html
+
+Install cli Linux
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html
+
+Install CLI macOS
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html
+
+Install CLI Docker
+https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-docker.html
+
+aws --version  (version aws cli)
+
+
+------------------
+1:
+aws configure
+AWS Access Key ID [None]: AKIAIOSFODNN7EXAMPLE
+AWS Secret Access Key [None]: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+Default region name [None]: us-west-2
+Default output format [None]: ENTER
+
+
+DynamoDB:
+a)Create table
+aws dynamodb create-table \
+    --table-name MusicCollection \
+    --attribute-definitions \
+    AttributeName=Artist,AttributeType=S AttributeName=SongTitle,AttributeType=S \
+    --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE \
+    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+
+
+b)put item
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,105 @@
+I)List of Amaeeon SWF command by Category:
+aws swf help
+aws swf register-domain help
+1)Commands related to Activities
+poll-for-activity-task
+respond-activity-task-completed
+respond-activity-task-failed
+respond-activity-task-canceled
+record-activity-task-heartbeat
+
+2)Commands related to Deciders
+poll-for-decision-task
+respond-decision-task-completed
+
+3)Commands related to Workflow Executions
+request-cancel-workflow-execution 
+start-workflow-execution 
+signal-workflow-execution 
+terminate-workflow-execution
+
+4)Commands related to Administration
+a)Activity Management
+register-activity-type
+deprecate-activity-type
+
+b)Workflow Management
+register-workflow-type
+deprecate-corkflow-type
+
+c)Domain Management
+register-domain
+deprecate-domain
+
+d)Workflow Execution Management
+request-cancel-workflow-execution
+terminate-workflow-execution
+
+e)Visiblity Commands
+*Activity Visibility
+list-activity-types
+describe-activity-type
+
+*Workflow Visibility
+list-workflow-types
+describe-workflow-type
+
+*Workflow Execution Visibility
+describe-workflow-execution 
+list-open-workflow-executions 
+list-closed-workflow-executions 
+count-open-workflow-executions 
+count-closed-workflow-executions 
+get-workflow-execution-history 
+
+*Domain Visibility 
+list-domains 
+describe-domain
+
+*Task list Visibility
+count-pending-activity-tasks
+count-pending-decision-tasks
+
+II)Working with Amazon SWF Domains Using the AWS CLI:
+1)List Your Domains
+aws swf list-domains --registration-status REGISTERED
+{
+    "domainInfos": [
+        {
+            "status": "REGISTERED",
+            "name": "ExampleDomain"
+        },
+        {
+            "status": "REGISTERED",
+            "name": "mytest"
+        }
+    ]
+}
+
+2)Get information about a Domain
+aws swf describe-domain --name ExampleDomain
+{
+"domainInfo": {
+        "status": "REGISTERED",
+        "name": "ExampleDomain"
+    },
+    "configuration": {
+        "workflowExecutionRetentionPeriodInDays": "1"
+    }
+} 
+
+3)Register a Domain
+aws swf register-domain --name MyNeatNewDomain --workflow-execution-retention-period-in-days 0
+
+4)Deprecation a Domain
+aws swf deprecate-domain --name MyNeatNewDomain
+
+*List deprecated domains
+aws swf list-domains --registration-status DEPRECATED
+
+
+
+
+
+5)
+

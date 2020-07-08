@@ -1,0 +1,105 @@
+To get list of all command available in each tier:
+aws s3 help
+aws s3api help
+
+
+I)Using S3 commands:
+1)Managing bucket:
+a)Create a Bucket:
+aws s3 mb s3://bucket-name
+
+b)Listing your buckets:
+aws s3 ls
+
+c)Delete a bucket:
+*Empty bucket
+aws s3 rb s3://bucket-name
+*Not empty bucket(if you are are using a versioned bucked that contains previously deleted but retained objects,you must first remove all of the content
+aws s3 rb s3://bucket-name --force
+
+
+2)Managing objects:
+Failed uploads can't be resumed .If the multipart upload fails due to a timeout or is manually canceled by pressing Ctrl+C, the AWS CLI cleans up any files created and aborts the upload.
+If the process is interrupted by a kill command or system system failure ,the in-progress remains in Amazon S3 and you must clean it by:
+*Console ->S3
+*s3api abort-multipart-upload 
+a)Copy file to s3:
+aws s3 cp file.txt s3://my-bucket/ --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers full=emailaddress=user@example.com full=id=258745878545
+
+--storage-class REDUCED_REDUNDANCY
+
+b)Sync :aws s3 sync <source> <target> [--options]
+
+*sync without delete:
+aws s3 sync . s3://my-bucket/path
+upload: MySubdirectory\MyFile3.txt to s3://my-bucket/path/MySubdirectory/MyFile3.txt
+upload: MyFile2.txt to s3://my-bucket/path/MyFile2.txt
+upload: MyFile1.txt to s3://my-bucket/path/MyFile1.txt
+
+*sync with delete
+-aws s3 sync . s3://my-bucket/path --delete
+delete: s3://my-bucket/path/MyFile1.txt
+
+-aws s3 sync s3://my-bucket/path . --delete
+delete: s3://my-bucket/path/MyFile1.txt
+
+-aws s3 sync s3://karim/path s3://my-bucket/path --delete
+delete: s3://my-bucket/path/MyFile1.txt
+
+*sync with IA storage class:
+aws s3 sync . s3://my-bucket/path --storage-class STANDARD_IA
+
+*option
+--exclude "*.txt"
+--include "myfile?.txt"
+--storage-class STANDARD_IA
+--delete
+--acl public-read (or public-write or public-read-write)
+--recursive
+
+c)Copy:
+aws s3 cp MyFile.txt s3://my-bucket/path/
+
+d)Move:
+aws s3 mv s3://my-bucket/path ./MyDirectory 
+
+e)Delete object:
+aws s3 rm s3://my-bucket/path/MySubdirectory/MyFile3.txt
+delete: s3://my-bucket/path/MySubdirectory/MyFile3.txt
+
+f)List all objects and folders:
+aws s3 ls s3://bucket-name
+aws s3 ls s3://bucket-name/path/
+
+II)Using S3api commands:
+1)Applying a custom ACL
+aws s3api put-bucket-acl --bucket MyBucket --grant-full-control 'emailaddress="user1@example.com",emailaddress="user2@example.com"' --grant-read 'uri="http://acs.amazonaws.com/groups/global/AllUsers"'
+
+2)Configuring a Logging Policy:
+aws s3api put-bucket-acl --bucket MyBucket --grant-read-acp 'URI="http://acs.amazonaws.com/groups/s3/LogDelivery"' --grant-write 'URI="http://acs.amazonaws.com/groups/s3/LogDelivery"'
+aws s3api put-bucket-logging --bucket MyBucket --bucket-logging-status file://logging.json
+Output:
+{
+  "LoggingEnabled": {
+    "TargetBucket": "MyBucket",
+    "TargetPrefix": "MyBucketLogs/",
+    "TargetGrants": [
+      {
+        "Grantee": {
+          "Type": "AmazonCustomerByEmail",
+          "EmailAddress": "user@example.com"
+        },
+        "Permission": "FULL_CONTROL"
+      },
+      {
+    "Grantee": {
+          "Type": "Group",
+          "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+        },
+        "Permission": "READ"
+      }
+    ]
+  }
+}
+
+
